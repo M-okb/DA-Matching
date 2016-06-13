@@ -1,5 +1,29 @@
-function DA_match(m,n)
-    function pref(m,n) #選考表の作成
+function DA_match(m_pref,n_pref)
+    m = size(m_pref)[2]
+    n = size(n_pref)[2]
+    m_match = zeros(Int64, m)
+    n_match = zeros(Int64, n)
+    for turn in 1:n+1
+        for man in 1:m
+            if m_match[man] == 0          #「まだ婚約者がいない」かつ
+                if find(m_pref[:,man] .==0)[1] > turn  #「結婚しないよりは、結婚したい人がいる」なら、プロポーズ発動
+                  proposed = m_pref[turn,man]
+                    if find(n_pref[:,proposed] .== man)[1] <
+                        find(n_pref[:,proposed] .== n_match[proposed])[1]   #自分が相手の婚約者（いないなら、０）より、マシであれば成婚
+                        if n_match[proposed] != 0           #婚約者がいれば、離婚します
+                            m_match[n_match[proposed]] = 0
+                        end
+                        m_match[man] = proposed
+                        n_match[proposed] = man
+                    end
+                end
+            end
+        end
+    end
+return m_match, n_match
+end
+
+    function pref(m,n) #ランダム選考表の作成(今回は使わない)
         m_pref = shuffle!(collect(0:n))
         n_pref = shuffle!(collect(0:m))
         #1列目だけ作成しておく
@@ -14,30 +38,3 @@ function DA_match(m,n)
         #あとはそれぞれloop
         return m_pref, n_pref
     end
-
-    men = 1:m
-    wemen = 1:n
-    m_match = zeros(Int64,m)
-    n_match = zeros(Int64,n)
-    m_pref, n_pref = pref(m,n)
-    for turn in 1:n+1
-        for man in men
-            if m_match[man] == 0
-                #「既に婚約者がいない」かつ
-                if find(m_pref[:,man] .==0)[1] < turn
-                    #「結婚しないほうがマシ」なら、プロポーズ発動
-                    #なんかfindがarrayで返されるので[1]つけてます
-                    if find(n_pref[:,m_pref[turn,man]] .== man)[1] < find(n_pref[:,m_pref[turn,man]] .== n_match[m_pref[turn,man]])[1] 
-                        #自分が相手の婚約者（いないなら、０）より、マシであれば成婚
-                        if n_match[m_pref[turn,man]] != 0
-                            m_match[n_match[m_pref[turn,man]]] = 0
-                        end
-                        m_match[man] = m_pref[turn,man]
-                        n_match[m_pref[turn,man]] = man
-                    end
-                end
-            end
-        end
-    end
-return m_match, n_match
-end
