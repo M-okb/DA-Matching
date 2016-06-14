@@ -1,7 +1,7 @@
 # Test file for Deferred Acceptance algorithm routine
 
 const file_name = "one-to-one.jl"
-const function_name = "DA_match"
+const function_name = "DA_algo"
 
 include(file_name)
 const fn = getfield(Main, Symbol(function_name))
